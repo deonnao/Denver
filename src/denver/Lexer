@@ -1,0 +1,175 @@
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.StringTokenizer;
+
+
+public class Main {
+    public static void main(String[] args) {
+        try {
+
+            ArrayList<String> datatypes = new ArrayList<>();
+            datatypes.add("int");
+            datatypes.add("float");
+            datatypes.add("double");
+            datatypes.add("char");
+            datatypes.add("String");
+            datatypes.add("char");
+            datatypes.add("boolean");
+
+            ArrayList<String> reserved = new ArrayList<>();
+            reserved.add("class");
+            reserved.add("public");
+            reserved.add("main");
+
+            ArrayList<String> arithmaticOperators = new ArrayList<>();
+            arithmaticOperators.add("+");
+            arithmaticOperators.add("-");
+            arithmaticOperators.add("*");
+            arithmaticOperators.add("/");
+            arithmaticOperators.add("%");
+            arithmaticOperators.add("++");
+            arithmaticOperators.add("--");
+            arithmaticOperators.add("+");
+            arithmaticOperators.add("+");
+
+            ArrayList<String> assignmentOperators = new ArrayList<>();
+            assignmentOperators.add("=");
+            assignmentOperators.add("+=");
+            assignmentOperators.add("-=");
+            assignmentOperators.add("/=");
+            assignmentOperators.add("%=");
+            assignmentOperators.add("&=");
+            assignmentOperators.add("|=");
+            assignmentOperators.add("^=");
+            assignmentOperators.add(">>=");
+            assignmentOperators.add("<<=");
+
+            ArrayList<String> modifiers = new ArrayList<>();
+            modifiers.add("static");
+            modifiers.add("final");
+            modifiers.add("abstract");
+            modifiers.add("transient");
+            modifiers.add("synchronized");
+            modifiers.add("volatile");
+
+
+            ArrayList<String> accessModifiers = new ArrayList<>();
+            accessModifiers.add("public");
+            accessModifiers.add("private");
+            accessModifiers.add("default");
+            accessModifiers.add("protected");
+
+            ArrayList<String> returnType = new ArrayList<>();
+            returnType.add("void");
+
+
+
+            ArrayList<String> comparisonOperators = new ArrayList<>();
+            comparisonOperators.add("==");
+            comparisonOperators.add("!=");
+            comparisonOperators.add(">");
+            comparisonOperators.add("<");
+            comparisonOperators.add(">=");
+            comparisonOperators.add("<=");
+
+            ArrayList<String> logicalOperators = new ArrayList<>();
+            logicalOperators.add("&&");
+            logicalOperators.add("||");
+            logicalOperators.add("!");
+
+            LinkedList<String> script = new LinkedList<>();
+            LinkedList<String> headers = new LinkedList<>();
+            HashMap<String, String> tokens = new HashMap<>();
+            File file = new File("Code");
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            //String gr = "String dog =";
+            //String gr = "main(String[] args)";
+            //String gr = "String pet = dog;";
+            //StringTokenizer str = new StringTokenizer(gr);
+            String linee;
+            String token;
+            String header;
+            int i = 0;
+            int j = 0;
+            int l = 1; // Counter variable for line number
+            while ((linee = br.readLine())!= null) {
+                System.out.println("Line " + l + ": " + linee);
+                if (linee.contains("public class") || linee.contains("public static void main(String[] args)")) {
+                    StringTokenizer hdr = new StringTokenizer(linee);
+                    while (hdr.hasMoreTokens()) {
+                        String wrd = hdr.nextToken();
+                        headers.add(wrd);
+                        System.out.print(wrd +", ");
+                    }
+                    System.out.println();
+                    while (j < headers.size()) {
+                        if (accessModifiers.contains(header = headers.get(j))) {
+                            System.out.println(header + " --> Access Modifier");
+                        }
+                        else if (modifiers.contains(header = headers.get(j))){
+                            System.out.println(header + " --> Modifier");
+                        }
+                        else if (returnType.contains(header = headers.get(j))){
+                            System.out.println(header + " --> Return Type");
+                        }
+                        j++;
+                    }
+
+
+                } else {
+                    StringTokenizer str = new StringTokenizer(linee);
+                    while (str.hasMoreTokens()) {
+                        String word = str.nextToken();
+                        script.add(word);
+                    }
+                    while (i < script.size()) {
+                        if (datatypes.contains(token = script.get(i))) {
+                            System.out.println(token + " --> DataType");
+                            System.out.println(token = script.get(i + 1) + " --> Variable");
+                        } else if (assignmentOperators.contains(token = script.get(i))) {
+                            System.out.println(token + " --> Assignment Operator");
+                            System.out.println(token = script.get(i + 1) + " --> Value");
+                        }
+                        i++;
+                    }
+                    //System.out.println(script);
+                }
+                l++;
+            }
+            /*for (String line : script) {
+                System.out.println(line);
+            }
+            System.out.print(script);*/
+        /*while (str.hasMoreTokens()) {
+            String word = str.nextToken();
+
+            if (datatypes.contains(word)){
+                System.out.println("x");
+            }
+            else if (arithmaticOperators.contains(word)){
+
+            }
+            else if (assignmentOperators.contains(word)){
+
+            }
+            else if (comparisonOperators.contains(word)){
+
+            }
+            else{
+                System.out.println(i+" " + word);
+                i++;
+            }
+            // Process the word (e.g., print it)
+            //System.out.print(word +" ");
+        }*/
+        } catch(FileNotFoundException e){
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+}
