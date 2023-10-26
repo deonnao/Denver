@@ -1,0 +1,111 @@
+import java.io.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.StringTokenizer;
+
+public class Main {
+    public static void main(String[] args) {
+        try {
+            // Define ArrayLists to store different types of language constructs
+            ArrayList<String> datatypes = new ArrayList<>();
+            datatypes.add("int");
+            datatypes.add("float");
+            // Add other data types...
+
+            ArrayList<String> modifiers = new ArrayList<>();
+            modifiers.add("static");
+            modifiers.add("final");
+            // Add other modifiers...
+
+            ArrayList<String> accessModifiers = new ArrayList<>();
+            accessModifiers.add("public");
+            accessModifiers.add("private");
+            // Add other access modifiers...
+
+            ArrayList<String> returnType = new ArrayList<>();
+            returnType.add("void");
+            // Add other return types...
+
+            LinkedList<String> script = new LinkedList<>();
+            LinkedList<String> headers = new LinkedList<>();
+            // Create data structures to store tokens
+
+            File file = new File("Code");
+            // Create a File object to read from a file
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            // Create a BufferedReader to efficiently read from the file
+
+            String linee;
+            String token;
+            String header;
+            int i = 0;
+            int j = 0;
+            int l = 1; // Counter variable for line number
+
+            // Read each line from the file
+            while ((linee = br.readLine()) != null) {
+
+                // Display the current line number and the line itself
+                System.out.println("Line " + l + ": " + linee);
+
+                if (linee.contains("public class") || linee.contains("public static void main(String[] args)")) {
+                    // Check if the line contains class or main method definition
+
+                    // Tokenize headers in the class definition or main method
+                    StringTokenizer hdr = new StringTokenizer(linee);
+                    while (hdr.hasMoreTokens()) {
+                        String wrd = hdr.nextToken();
+                        headers.add(wrd);
+                        System.out.print(wrd + ", ");
+                    }
+                    System.out.println();
+
+                    // Identify and categorize headers (access modifiers, modifiers, return types)
+                    while (j < headers.size()) {
+                        // Check if the header is an access modifier
+                        if (accessModifiers.contains(header = headers.get(j))) {
+                            System.out.println(header + " --> Access Modifier");
+                        }
+                        // Check if the header is a modifier
+                        else if (modifiers.contains(header = headers.get(j))) {
+                            System.out.println(header + " --> Modifier");
+                        }
+                        // Check if the header is a return type
+                        else if (returnType.contains(header = headers.get(j))) {
+                            System.out.println(header + " --> Return Type");
+                        }
+                        j++;
+                    }
+                } else {
+                    // Tokenize words in the code
+                    StringTokenizer str = new StringTokenizer(linee);
+                    while (str.hasMoreTokens()) {
+                        String word = str.nextToken();
+                        script.add(word);
+                    }
+
+                    // Identify and categorize tokens (data types, modifiers)
+                    while (i < script.size()) {
+                        // Check if the token is a data type
+                        if (datatypes.contains(token = script.get(i))) {
+                            // Print the data type and the following token as a variable
+                            System.out.println(token + " --> DataType, " + script.get(i + 1) + " --> Variable");
+                        }
+                        // Check if the token is a modifier
+                        else if (modifiers.contains(token = script.get(i))) {
+                            System.out.println(token + " --> Modifier");
+                        }
+                        i++;
+                    }
+                }
+                l++; // Increment the line counter
+            }
+        } catch (FileNotFoundException e) {
+            // Handle file not found exception
+            System.err.println("File not found: " + e.getMessage());
+        } catch (IOException e) {
+            // Handle general I/O exception
+            throw new RuntimeException(e);
+        }
+    }
+}
