@@ -8,20 +8,36 @@ import java.util.StringTokenizer;
 public class Main {
     public static void main(String[] args) {
         try {
+            long[] dog = {1,2,3,4};
 
             ArrayList<String> datatypes = new ArrayList<>();
             datatypes.add("int");
             datatypes.add("float");
             datatypes.add("double");
+            datatypes.add("long");
             datatypes.add("char");
             datatypes.add("String");
             datatypes.add("char");
             datatypes.add("boolean");
 
-            ArrayList<String> reserved = new ArrayList<>();
-            reserved.add("class");
-            reserved.add("public");
-            reserved.add("main");
+            ArrayList<Character> numbers = new ArrayList<Character>();
+            numbers.add('0');
+            numbers.add('1');
+            numbers.add('2');
+
+            HashMap<String, String> keywords = new HashMap<>();
+            keywords.put("for","for loop");
+
+            ArrayList<String> keyword = new ArrayList<>();
+            keyword.add("class");
+            keyword.add("public");
+            keyword.add("main");
+
+            ArrayList<String> symbols = new ArrayList<>();
+            symbols.add("(");
+            symbols.add(")");
+            symbols.add("{");
+            symbols.add("}");
 
             ArrayList<String> arithmaticOperators = new ArrayList<>();
             arithmaticOperators.add("+");
@@ -54,7 +70,6 @@ public class Main {
             modifiers.add("synchronized");
             modifiers.add("volatile");
 
-
             ArrayList<String> accessModifiers = new ArrayList<>();
             accessModifiers.add("public");
             accessModifiers.add("private");
@@ -63,8 +78,6 @@ public class Main {
 
             ArrayList<String> returnType = new ArrayList<>();
             returnType.add("void");
-
-
 
             ArrayList<String> comparisonOperators = new ArrayList<>();
             comparisonOperators.add("==");
@@ -79,31 +92,47 @@ public class Main {
             logicalOperators.add("||");
             logicalOperators.add("!");
 
-            LinkedList<String> script = new LinkedList<>();
-            LinkedList<String> headers = new LinkedList<>();
-            HashMap<String, String> tokens = new HashMap<>();
-            File file = new File("Code");
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            //String gr = "String dog =";
-            //String gr = "main(String[] args)";
-            //String gr = "String pet = dog;";
-            //StringTokenizer str = new StringTokenizer(gr);
-            String linee;
-            String token;
+
+            LinkedList<String> script = new LinkedList<>(); // Linked list containing basic tokes
+            LinkedList<String> headers = new LinkedList<>(); // Linked List containing tokens from lines with headers
+            LinkedList<String> containsBrackets = new LinkedList<>(); // Linked List containing tokens from lines with brackets
+            LinkedList<String> forLoop = new LinkedList<>(); // Linked List containing tokens from lines with for loops
+            LinkedList<String> systOut = new LinkedList<>(); // Linked List for Print statements
+
+
+
+            File file = new File("Code"); // File containing source code
+            BufferedReader br = new BufferedReader(new FileReader(file)); // Buffered Reader to read in source file code
+
+
+            String linee; // Varibale representing lines of code read in from source code txt file
+            String token; // Variable representing individual tokesn
             String header;
-            int i = 0;
-            int j = 0;
+
+            // Counters unique to each Linked List
+
+            int i = 0; // Base counter variable for Linked List containing tokens from lines
+                       // without brackets, headers, or comments
+            int j = 0; // Counter variable for headers Linked List
+            int z = 0; // Counter variable for brackets Linked List
+            int u = 0; // Counter variable for for loop Linked List
+            int v = 0;
             int l = 1; // Counter variable for line number
+
+            // Loop that facilitates the lexical analysis of a source code read in from a file
+
             while ((linee = br.readLine())!= null) {
                 System.out.println("Line " + l + ": " + linee);
-                if (linee.contains("public class") || linee.contains("public static void main(String[] args)")) {
+
+                // Lexical breakdown of lines of code containing "Headers"
+
+                if (linee.contains("public class") || linee.contains("public static void main")) {
                     StringTokenizer hdr = new StringTokenizer(linee);
                     while (hdr.hasMoreTokens()) {
                         String wrd = hdr.nextToken();
                         headers.add(wrd);
-                        System.out.print(wrd +", ");
                     }
-                    System.out.println();
+
                     while (j < headers.size()) {
                         if (accessModifiers.contains(header = headers.get(j))) {
                             System.out.println(header + " --> Access Modifier");
@@ -114,11 +143,135 @@ public class Main {
                         else if (returnType.contains(header = headers.get(j))){
                             System.out.println(header + " --> Return Type");
                         }
+                        else if (keyword.contains(header = headers.get(j))){
+                            System.out.println(header + " --> Keyword");
+                        }
+                        else if (keyword.contains(header = headers.get(j-1))){
+                            header = headers.get(j);
+                            System.out.println(header + " --> Class Name (IDENTIFIER)");
+                        }
                         j++;
                     }
 
 
-                } else {
+                }
+
+                // Lexical breakdown of lines of code containing brackets
+
+                else if (linee.contains("[]") || linee.contains("[") || linee.contains("]")){
+                    String arrayDeclaration = linee;
+                    StringBuilder separate = new StringBuilder();
+                    StringTokenizer brac = new StringTokenizer(linee);
+                    for (int k = 1; k < arrayDeclaration.length(); k++) {
+                        char c = arrayDeclaration.charAt(k-1);
+                        char c1 = arrayDeclaration.charAt(k);
+                        if (c == '[' && c1 == ']'){
+                            System.out.println("[] --> LBracket and RBracket");
+                        }
+                    }
+                    while (brac.hasMoreTokens()) {
+                        String dec = brac.nextToken(); // Declaration
+                        containsBrackets.add(dec);
+                    }
+                    while (z < containsBrackets.size()) {
+                        if (datatypes.contains(token = containsBrackets.get(z))) {
+                            System.out.println(token + " --> DataType");
+                            System.out.println(token = containsBrackets.get(z + 1) + " --> IDENTIFIER Represents Variable Name");
+                        }
+                        else if (assignmentOperators.contains(token = containsBrackets.get(z))) {
+                            System.out.println(token + " --> Assignment Operator");
+                            if (containsBrackets.get(z + 1).equals("new")) {
+                                System.out.println(token = containsBrackets.get(z + 1) + " --> Keyword for Array Initialization");
+
+                            }
+                            //System.out.println(token = containsBrackets.get(z + 1) + " --> Value");
+                        }
+                        else if(containsBrackets.get(z).contains("[")){
+                            token = containsBrackets.get(z);
+                            if (token.length() == 3){
+                                System.out.println(containsBrackets.get(z-1)+ "--> IDENTIFIER Represents Varibale Name");
+                                System.out.println(token +"--> Initializing index");
+                            }
+                        }
+                        /*else if (containsBrackets.get(z).contains("[") && (containsBrackets.get(z).length() == 3)){
+                            System.out.println(containsBrackets.get(z) +" --> Variable name(IDENTIFIER)");
+                        }*/
+                        else {
+                            if (containsBrackets.get(z) != "new") {
+                            }
+
+
+                        }
+                        z++;
+                    }
+
+                }
+                else if(linee.contains("//")){
+                    System.out.println(linee + " --> Comment");
+                }
+
+                // Lexical breakdown of lines of code containing for loops
+
+                else if(linee.contains("for")){
+                    StringTokenizer forr = new StringTokenizer(linee);
+                    while (forr.hasMoreTokens()) {
+                        String loopVar = forr.nextToken(); // Declaration
+                        forLoop.add(loopVar);
+                    }
+                    while (u < forLoop.size()) {
+                        if (datatypes.contains(token = forLoop.get(u))) {
+                            System.out.println(token + " --> DataType");
+                            System.out.println(token = forLoop.get(u + 1) + " --> IDENTIFIER Represents Variable Name");
+                        }
+                        else if (assignmentOperators.contains(token = forLoop.get(u))) {
+                            System.out.println(token + " --> Assignment Operator");
+                            System.out.println(token = forLoop.get(u + 1) + " --> Value");
+                        }
+                        else if (symbols.contains(token = forLoop.get(u))){
+                            if (token.equals("(") || token.equals(")")){
+                                System.out.println(token + " --> Parentheses");
+                            }
+                            else {
+                                System.out.println(token + " --> Curly Brackets");
+                            }
+
+                        }
+                        else if(comparisonOperators.contains(token = forLoop.get(u))) {
+                            System.out.println(token + " --> Comparison Operator");
+
+                        }
+                        else if(forLoop.get(u).contains("++")){
+                            System.out.println(forLoop.get(u) + " --> Increment Operator");
+                        }
+                        else if(keywords.containsKey(token = forLoop.get(u))){
+                            System.out.println(token + " --> Keyword for a " + keywords.get(token));
+                        }
+                        u++;
+
+                        }
+
+
+
+                }
+
+                else if(linee.contains("System.out.print")){
+                    StringTokenizer out = new StringTokenizer(linee);
+                    while (out.hasMoreTokens()) {
+                        String outt = out.nextToken();
+                        systOut.add(outt);
+                    }
+                    while (v < systOut.size()){
+                        if (systOut.get(v).contains("[")){
+                            System.out.println(systOut.get(v-1) + " --> IDENTIFIER Variable Name");
+                            System.out.println(systOut.get(v) + " --> Index Location");
+
+                        }
+                        else if (systOut.get(v).contains("System")){
+                            System.out.println(systOut.get(v) + " --> Print Statement");
+                        }
+                    }
+                }
+                else {
                     StringTokenizer str = new StringTokenizer(linee);
                     while (str.hasMoreTokens()) {
                         String word = str.nextToken();
@@ -127,43 +280,26 @@ public class Main {
                     while (i < script.size()) {
                         if (datatypes.contains(token = script.get(i))) {
                             System.out.println(token + " --> DataType");
-                            System.out.println(token = script.get(i + 1) + " --> Variable");
-                        } else if (assignmentOperators.contains(token = script.get(i))) {
+                            System.out.println(token = script.get(i + 1) + " --> IDENTIFIER Represents Variable Name");
+                        }
+                        else if (assignmentOperators.contains(token = script.get(i))) {
                             System.out.println(token + " --> Assignment Operator");
                             System.out.println(token = script.get(i + 1) + " --> Value");
                         }
+                        else if (symbols.contains(token = script.get(i))){
+                            if (token.equals("(") || token.equals(")")){
+                                System.out.println(token + " --> Parentheses");
+                            }
+                            else {
+                                System.out.println(token + " --> Curly Brackets");
+                            }
+                        }
                         i++;
                     }
-                    //System.out.println(script);
                 }
                 l++;
             }
-            /*for (String line : script) {
-                System.out.println(line);
-            }
-            System.out.print(script);*/
-        /*while (str.hasMoreTokens()) {
-            String word = str.nextToken();
 
-            if (datatypes.contains(word)){
-                System.out.println("x");
-            }
-            else if (arithmaticOperators.contains(word)){
-
-            }
-            else if (assignmentOperators.contains(word)){
-
-            }
-            else if (comparisonOperators.contains(word)){
-
-            }
-            else{
-                System.out.println(i+" " + word);
-                i++;
-            }
-            // Process the word (e.g., print it)
-            //System.out.print(word +" ");
-        }*/
         } catch(FileNotFoundException e){
 
         } catch (IOException e) {
@@ -172,4 +308,3 @@ public class Main {
 
 
     }
-}
