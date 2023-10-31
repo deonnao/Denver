@@ -8,8 +8,6 @@ import java.util.StringTokenizer;
 public class Main {
     public static void main(String[] args) {
         try {
-            long[] dog = {1,2,3,4};
-
             ArrayList<String> datatypes = new ArrayList<>();
             datatypes.add("int");
             datatypes.add("float");
@@ -25,8 +23,21 @@ public class Main {
             numbers.add('1');
             numbers.add('2');
 
+            ArrayList<String> numbers1 = new ArrayList<String>();
+            numbers1.add("0");
+            numbers1.add("1");
+            numbers1.add("2");
+            numbers1.add("3");
+            numbers1.add("4");
+            numbers1.add("5");
+            numbers1.add("6");
+            numbers1.add("7");
+            numbers1.add("8");
+            numbers1.add("9");
+            numbers1.add("10");
+            
             HashMap<String, String> keywords = new HashMap<>();
-            keywords.put("for","for loop");
+            keywords.put("for", "for loop");
 
             ArrayList<String> keyword = new ArrayList<>();
             keyword.add("class");
@@ -91,14 +102,15 @@ public class Main {
             logicalOperators.add("&&");
             logicalOperators.add("||");
             logicalOperators.add("!");
-
-
+            
+            
             LinkedList<String> script = new LinkedList<>(); // Linked list containing basic tokes
             LinkedList<String> headers = new LinkedList<>(); // Linked List containing tokens from lines with headers
             LinkedList<String> containsBrackets = new LinkedList<>(); // Linked List containing tokens from lines with brackets
             LinkedList<String> forLoop = new LinkedList<>(); // Linked List containing tokens from lines with for loops
             LinkedList<String> systOut = new LinkedList<>(); // Linked List for Print statements
-
+            LinkedList<String> identifiers = new LinkedList<>();
+            LinkedList<String> constants = new LinkedList<>();
 
 
             File file = new File("Code"); // File containing source code
@@ -106,7 +118,8 @@ public class Main {
 
 
             String linee; // Varibale representing lines of code read in from source code txt file
-            String token; // Variable representing individual tokesn
+            String token; // Variable representing individual token
+            String colon; // Varible used for 'COLON' token
             String header;
 
             // Counters unique to each Linked List
@@ -116,12 +129,12 @@ public class Main {
             int j = 0; // Counter variable for headers Linked List
             int z = 0; // Counter variable for brackets Linked List
             int u = 0; // Counter variable for for loop Linked List
-            int v = 0;
+            int v = 0; // Counter variable for print statement Linked List
             int l = 1; // Counter variable for line number
 
             // Loop that facilitates the lexical analysis of a source code read in from a file
 
-            while ((linee = br.readLine())!= null) {
+            while ((linee = br.readLine()) != null) {
                 System.out.println("Line " + l + ": " + linee);
 
                 // Lexical breakdown of lines of code containing "Headers"
@@ -137,18 +150,72 @@ public class Main {
                         if (accessModifiers.contains(header = headers.get(j))) {
                             System.out.println(header + " --> Access Modifier");
                         }
-                        else if (modifiers.contains(header = headers.get(j))){
+                        else if (modifiers.contains(header = headers.get(j))) {
                             System.out.println(header + " --> Modifier");
                         }
-                        else if (returnType.contains(header = headers.get(j))){
+                        else if (returnType.contains(header = headers.get(j))) {
                             System.out.println(header + " --> Return Type");
                         }
-                        else if (keyword.contains(header = headers.get(j))){
+                        else if (keyword.contains(header = headers.get(j))) {
                             System.out.println(header + " --> Keyword");
                         }
-                        else if (keyword.contains(header = headers.get(j-1))){
+                        else if (headers.get(j).contains("(") || headers.get(j).contains(")")){
+                            String arrDec = headers.get(j);
+                            if (arrDec.contains("(")){
+                                int k = 0;
+                                int s0 = 0; // location of open colon
+                                int s1 = 0; // location of open bracket
+                                int s2 = 0; // location of closed bracket
+
+                                while (k < arrDec.length()){
+                                    if (arrDec.charAt(k) == '('){
+                                        s0 = k;
+
+                                    }
+                                    else if(arrDec.charAt(k) == '['){
+                                        s1 = k;
+                                    }
+                                    else if(arrDec.charAt(k) == ']'){
+                                        s2 = k;
+                                    }
+                                    k++;
+                                }
+                                token = arrDec.substring(0,s0);
+                                if (keyword.contains(token)){
+                                    System.out.println(token + " --> Method name (IDENTIFIER)");
+                                }
+                                System.out.println(arrDec.charAt(s0) + " --> Opening Colon (PUNCTUATOR");
+                                token = arrDec.substring(s0+1,s1);
+                                if (datatypes.contains(token)){
+                                    System.out.println(token + " --> DataType");
+                                }
+                                System.out.println(arrDec.charAt(s0) + " --> Opening bracket (PUNCTUATOR");
+                                System.out.println(arrDec.charAt(s1) + " --> Closing bracket (PUNCTUATOR");
+
+
+
+
+                            }
+                            else{
+                                int k = 0;
+
+                                while (arrDec.charAt(k) != ')'){
+                                    k++;
+                                }
+                                token = arrDec.substring(0,k);
+                                System.out.println(token + " --> Parameter name (IDENTIFIER)");
+                                identifiers.add(token);
+                                System.out.println(arrDec.charAt(k) + " --> Closing Colon");
+                            }
+                        }
+                        else if (keyword.contains(header = headers.get(j - 1))) {
                             header = headers.get(j);
                             System.out.println(header + " --> Class Name (IDENTIFIER)");
+                        }
+                        else{
+                            if (headers.get(j).contains("{")){
+                                System.out.println(headers.get(j) + " --> Curly Bracket (PUNCTUATOR)");
+                            }
                         }
                         j++;
                     }
@@ -156,27 +223,265 @@ public class Main {
 
                 }
 
+                // Lexical breakdown of lines of code containing print statements
+
+                else if (linee.contains("System.out.print")) {
+                    StringTokenizer out = new StringTokenizer(linee);
+                    while (out.hasMoreTokens()) {
+                        String outt = out.nextToken();
+                        systOut.add(outt);
+                        System.out.println("!  " + outt + "  !");
+                    }
+                    while (v < systOut.size()) {
+                        if (systOut.get(v).contains("System")) {
+                            String arrDec = systOut.get(v);
+
+                            int k = 0;
+                            int s0 = 0;
+                            int s1 = 0;
+                            char tok;
+
+                            while(k < arrDec.length()){
+                                tok = arrDec.charAt(k);
+                                if (tok == '.'){
+                                    if (k != s0) {
+                                        token = arrDec.substring(s0, k);
+                                        if (token.equals("System")){
+                                            System.out.println(token + " --> Class name (IDENTIFIER)");
+                                            System.out.println(". --> Dot operator");
+                                        }
+                                        else if(token.equals("out")){
+                                            System.out.println(token + " --> Field name (IDENTIFIER)");
+                                            System.out.println(". --> Dot operator");
+                                        }
+                                        s0 = k + 1;
+                                    }
+                                }
+                                else if(tok == '('){
+                                    token = arrDec.substring(s0,k);
+                                    System.out.println(token + " --> Field name (IDENTIFIER)");
+                                    s1 = k + 1;
+                                }
+
+                                k++;
+                            }
+                            token = arrDec.substring(s1,arrDec.length());
+                            if (token.contains("[")){
+                                arrDec = token;
+
+                                k = 0;
+                                s0 = 0;
+                                s1 = 0;
+
+                                while (k < arrDec.length()){
+                                    if (arrDec.charAt(k) == '['){
+                                        System.out.println("[");
+                                        s0 = k;
+                                    }
+                                    if(arrDec.charAt(k) == ']'){
+                                        s1 = k;
+                                    }
+                                    k++;
+                                }
+                                token = arrDec.substring(0,s0);
+                                if (identifiers.contains(token)){
+                                    System.out.println(token + " --> Variable name (IDENTIFIER)");
+                                    s0++;
+                                }
+
+                                System.out.println("[ --> Open bracket (PUNCTUATOR)");
+                                token = arrDec.substring(s0,s1);
+                                if (identifiers.contains(token)){
+                                    System.out.println(token + " --> Variable name (IDENTIFIER)");
+                                }
+                                else if (constants.contains(token)){
+                                    System.out.println(token + " --> Value (Constant)");
+                                }
+                                System.out.println("] --> Close bracket (PUNCTUATOR)");
+                            }
+
+                        }
+                        else if (arithmaticOperators.contains(token = systOut.get(v))){
+                            System.out.println(token + " --> Arithmetic Operator");
+                        }
+                        else if(systOut.get(v).contains(")")){
+                            String arrDec = systOut.get(v);
+
+                            int k = 0;
+                            int s0 = 0;
+                            int s1 = 0;
+
+                            while(k < arrDec.length()){
+                                if(arrDec.charAt(k) == ')'){
+                                    s0 = k;
+                                }
+                                else if(arrDec.charAt(k) == ';'){
+                                    s1 = k;
+                                }
+                                k++;
+                            }
+                            System.out.println(arrDec.substring(0,s0) + " --> String literal");
+                            System.out.println(arrDec.substring(s0,s1) + " --> Closing Colon (PUNCTUATOR)");
+                            System.out.println(arrDec.substring(s1) + " --> Semicolon (PUNCTUATOR)");
+
+
+                        }
+                        else {
+                            System.out.println(systOut.get(v) + " --> String literal");
+                        }
+                        v++;
+                    }
+                }
+
                 // Lexical breakdown of lines of code containing brackets
 
-                else if (linee.contains("[]") || linee.contains("[") || linee.contains("]")){
+                else if (linee.contains("[]") || linee.contains("[") || linee.contains("]") && !linee.contains("System.out.print")) {
                     String arrayDeclaration = linee;
-                    StringBuilder separate = new StringBuilder();
                     StringTokenizer brac = new StringTokenizer(linee);
-                    for (int k = 1; k < arrayDeclaration.length(); k++) {
-                        char c = arrayDeclaration.charAt(k-1);
-                        char c1 = arrayDeclaration.charAt(k);
-                        if (c == '[' && c1 == ']'){
-                            System.out.println("[] --> LBracket and RBracket");
-                        }
-                    }
+
                     while (brac.hasMoreTokens()) {
                         String dec = brac.nextToken(); // Declaration
                         containsBrackets.add(dec);
                     }
+
                     while (z < containsBrackets.size()) {
-                        if (datatypes.contains(token = containsBrackets.get(z))) {
-                            System.out.println(token + " --> DataType");
-                            System.out.println(token = containsBrackets.get(z + 1) + " --> IDENTIFIER Represents Variable Name");
+                        if(containsBrackets.get(z).contains("[]")){
+                            String arrDec = containsBrackets.get(z);
+                            StringBuilder sb = new StringBuilder();
+                            int k = 0;
+                            while (arrDec.charAt(k) != '['){
+                                sb.append(arrDec.charAt(k));
+                                k++;
+                            }
+                            token = sb.toString();
+                            if (datatypes.contains(token)){
+                                System.out.println(token + " --> DataType");
+                                System.out.println("[ --> Open bracket");
+                                System.out.println("] --> Close bracket");
+                            }
+
+                        }
+                        else if (containsBrackets.get(z).contains("[") && containsBrackets.get(z).contains(";")) {
+                            String arrDec = containsBrackets.get(z);
+
+                            int k = 0;
+                            int s0 = 0; // Index of first bracket
+                            int s1 = 0; // Index of second bracket
+
+                            while (k < arrDec.length()){
+                                if (arrDec.charAt(k) == '['){
+                                    s0 = k;
+                                    token = arrDec.substring(0,s0);
+                                    if (datatypes.contains(token)){
+                                        System.out.println(token + " --> Data type");
+                                    }
+                                    else if (identifiers.contains(token)){
+                                        System.out.println(token + " --> Variable (IDENTIFIER)");
+                                    }
+                                    s0++;
+                                }
+                                else if (arrDec.charAt(k) == ']'){
+                                    s1 = k;
+                                }
+                                k++;
+                            }
+                            token = arrDec.substring(s0,s1);
+                            System.out.println("[ --> Open bracket (PUNCTUATOR)");
+                            if (constants.contains(token)){
+                                System.out.println(token + " --> Value (CONSTANT)");
+                            }
+                            else if (identifiers.contains(token)){
+                                System.out.println(token + " --> Variable (IDENTIFIER)");
+                            }
+                            else{
+                                System.out.println(token + " --> Variable (IDENTIFIER)");
+                                identifiers.add(token);
+                            }
+                            System.out.println("] --> Close bracket (PUNCTUATOR)");
+                            System.out.println("; --> Semicolon (PUNCTUATOR)");
+                        }
+                        else if (containsBrackets.get(z).contains("[") && containsBrackets.get(z).contains("]")) {
+                            String arrDec = containsBrackets.get(z);
+
+                            int k = 0;
+                            int s0 = 0; // Index of first bracket
+                            int s1 = 0; // Index of second bracket
+
+                            while (k < arrDec.length()){
+                                if (arrDec.charAt(k) == '['){
+                                    s0 = k;
+                                    token = arrDec.substring(0,s0);
+                                    if (datatypes.contains(token)){
+                                        System.out.println(token + " --> Data type");
+                                    }
+                                    else if (identifiers.contains(token)){
+                                        System.out.println(token + " --> Variable (IDENTIFIER)");
+                                    }
+                                    s0++;
+                                }
+                                else if (arrDec.charAt(k) == ']'){
+                                    s1 = k;
+                                }
+                                k++;
+                            }
+                            token = arrDec.substring(s0,s1);
+                            System.out.println("[ --> Open bracket (PUNCTUATOR)");
+                            if (numbers1.contains(token)){
+                                System.out.println(token + " --> Value (CONSTANT)");
+                                constants.add(token);
+                            }
+                            else if (identifiers.contains(token)){
+                                System.out.println(token + " --> Variable (IDENTIFIER)");
+                            }
+                            System.out.println("] --> Close bracket (PUNCTUATOR)");
+
+                        }
+                        else if (containsBrackets.get(z).contains("[")) {
+                            String arrDec = containsBrackets.get(z);
+                            StringBuilder sb = new StringBuilder();
+
+                            int k = 0;
+                            int s0 = 0;
+                            String token1;
+
+                            while(k < arrDec.length()){
+                                sb.append(arrDec.charAt(k));
+                                token = sb.toString();
+                                if (arrDec.charAt(k) == '['){
+                                    s0 = k;
+                                }
+                                    k++;
+                            }
+
+                            System.out.println(arrDec.charAt(s0) +" --> Open bracket");
+                            token = arrDec.substring(0,s0);
+
+                            if (identifiers.contains(token)){
+                                System.out.println(token + " --> Variable (IDENTIFIER)");
+                            }
+                            token = arrDec.substring(s0+1,k);
+                            System.out.println(token + " --> Variable (IDENTIFIER)");
+
+                        }
+                        else if (containsBrackets.get(z).contains("]")) {
+                            String arrDec = containsBrackets.get(z);
+                            int k = 0;
+                            while (arrDec.charAt(k) != ']'){
+                                k++;
+                            }
+                            token = arrDec.substring(0,k);
+                            if (constants.contains(token)){
+                                System.out.println(token + " --> Value (CONSTANT)");
+                                System.out.println("] --> Close bracket (PUNCTUATOR)");
+                            }
+                            if ((k+1) == (arrDec.length()-1)){
+                                System.out.println("; --> Semicolon (PUNCTUATOR)");
+                            }
+
+
+                        }
+                        else if (arithmaticOperators.contains(token = containsBrackets.get(z))) {
+                            System.out.println(token + " --> Arithmetic Operator");
                         }
                         else if (assignmentOperators.contains(token = containsBrackets.get(z))) {
                             System.out.println(token + " --> Assignment Operator");
@@ -184,20 +489,32 @@ public class Main {
                                 System.out.println(token = containsBrackets.get(z + 1) + " --> Keyword for Array Initialization");
 
                             }
-                            //System.out.println(token = containsBrackets.get(z + 1) + " --> Value");
+
                         }
-                        else if(containsBrackets.get(z).contains("[")){
-                            token = containsBrackets.get(z);
-                            if (token.length() == 3){
-                                System.out.println(containsBrackets.get(z-1)+ "--> IDENTIFIER Represents Varibale Name");
-                                System.out.println(token +"--> Initializing index");
-                            }
-                        }
-                        /*else if (containsBrackets.get(z).contains("[") && (containsBrackets.get(z).length() == 3)){
-                            System.out.println(containsBrackets.get(z) +" --> Variable name(IDENTIFIER)");
-                        }*/
                         else {
-                            if (containsBrackets.get(z) != "new") {
+                            if (containsBrackets.get(z).equals("new")) {
+                            }
+                            else if(containsBrackets.get(z).contains(";")){
+                                String arrDec = containsBrackets.get(z);
+                                StringBuilder sb = new StringBuilder();
+
+                                int k = 0;
+
+                                while(arrDec.charAt(k) != ';'){
+                                    sb.append(arrDec.charAt(k));
+                                    k++;
+                                }
+
+                                token = sb.toString();
+
+                                if(numbers1.contains(token)){
+                                    System.out.println(token + " --> Value (CONSTANT)");
+                                }
+                                System.out.println("; --> Semicolon (PUNCTUATOR)");
+                            }
+                            else{
+                                System.out.println(containsBrackets.get(z) + " --> Variable (IDENTIFIER)");
+                                identifiers.add(containsBrackets.get(z));
                             }
 
 
@@ -206,71 +523,106 @@ public class Main {
                     }
 
                 }
-                else if(linee.contains("//")){
+
+                // Lexical identification of comments
+
+                else if (linee.contains("//")) {
                     System.out.println(linee + " --> Comment");
                 }
 
                 // Lexical breakdown of lines of code containing for loops
 
-                else if(linee.contains("for")){
+                else if (linee.contains("for")) {
                     StringTokenizer forr = new StringTokenizer(linee);
                     while (forr.hasMoreTokens()) {
                         String loopVar = forr.nextToken(); // Declaration
                         forLoop.add(loopVar);
                     }
                     while (u < forLoop.size()) {
-                        if (datatypes.contains(token = forLoop.get(u))) {
-                            System.out.println(token + " --> DataType");
-                            System.out.println(token = forLoop.get(u + 1) + " --> IDENTIFIER Represents Variable Name");
+                        if (forLoop.get(u).equals("for")) { // Axiomatically, the value following for has to contain the
+                                                            // first value of the loop and that has to be seperated from
+                                                            // the colon that marks the parameters of the foe loop
+                            System.out.println(forLoop.get(u) + " --> Keyword for a " + keywords.get(forLoop.get(u)));
+                            token = forLoop.get(u + 1);
+                            String arrDec = token;
+                            StringBuilder nS = new StringBuilder(); // New string for token
+                            char cln = token.charAt(0);
+                            colon = Character.toString(cln);
+                            for (int k = 1; k < arrDec.length(); k++) {
+                                nS.append(arrDec.charAt(k));
+                            }
+                            token = nS.toString();
+                            System.out.println(colon + " --> Opening Colon (PUNCTUATOR)");
+                            if (datatypes.contains(token)) {
+                                System.out.println(token + " --> DataType");
+                                token = forLoop.get(u + 2);
+                                identifiers.add(token);
+                            }
+                        }
+                        else if (identifiers.contains(token = forLoop.get(u))){
+                            System.out.println(token + " --> Variable (IDENTIFIER)");
                         }
                         else if (assignmentOperators.contains(token = forLoop.get(u))) {
                             System.out.println(token + " --> Assignment Operator");
-                            System.out.println(token = forLoop.get(u + 1) + " --> Value");
                         }
-                        else if (symbols.contains(token = forLoop.get(u))){
-                            if (token.equals("(") || token.equals(")")){
+                        else if (symbols.contains(token = forLoop.get(u))) {
+                            if (token.equals("(") || token.equals(")")) {
                                 System.out.println(token + " --> Parentheses");
                             }
                             else {
-                                System.out.println(token + " --> Curly Brackets");
+                                System.out.println(token + " --> Curly Bracket (PUNCTUATOR)");
                             }
 
                         }
-                        else if(comparisonOperators.contains(token = forLoop.get(u))) {
+                        else if (comparisonOperators.contains(token = forLoop.get(u))) {
                             System.out.println(token + " --> Comparison Operator");
 
                         }
-                        else if(forLoop.get(u).contains("++")){
-                            System.out.println(forLoop.get(u) + " --> Increment Operator");
+                        else if (forLoop.get(u).contains("++")) {
+                            String arrDec = forLoop.get(u);
+                            StringBuilder sb = new StringBuilder();
+                            String var;
+                            for(int k = 0; k < arrDec.length(); k++){
+                                var = String.valueOf(sb.append(arrDec.charAt(k)));
+                                if (identifiers.contains(var)){
+                                    System.out.println(var + " --> Variable (IDENTIFIER)");
+                                }
+
+                            }
+                            System.out.println("++ --> Increment Operator");
+                            System.out.println(arrDec.charAt((arrDec.length()-1)) + " --> Closing Colon (PUNCTUATOR)");
                         }
-                        else if(keywords.containsKey(token = forLoop.get(u))){
-                            System.out.println(token + " --> Keyword for a " + keywords.get(token));
+                        else if (forLoop.get(u).contains(";")){
+                            String arrDec = forLoop.get(u);
+                            StringBuilder sb = new StringBuilder();
+                            int k = 0;
+                            while (arrDec.charAt(k) != ';'){
+                                sb.append(arrDec.charAt(k));
+                                token = sb.toString();
+                                k++;
+                            }
+                            if (numbers1.contains(token)){
+                                constants.add(token);
+                                System.out.println(token + " --> Value (CONSTANT)");
+                            }
+                            else{
+                                identifiers.add(token);
+                                System.out.println(token + " --> Variable (IDENTIFIER)");
+                            }
+                            System.out.println(arrDec.charAt(k) + " --> Semicolon (PUNCTUATOR)");
+
+
                         }
+
                         u++;
 
-                        }
-
+                    }
 
 
                 }
 
-                else if(linee.contains("System.out.print")){
-                    StringTokenizer out = new StringTokenizer(linee);
-                    while (out.hasMoreTokens()) {
-                        String outt = out.nextToken();
-                        systOut.add(outt);
-                    }
-                    while (v < systOut.size()){
-                        if (systOut.get(v).contains("[")){
-                            System.out.println(systOut.get(v-1) + " --> IDENTIFIER Variable Name");
-                            System.out.println(systOut.get(v) + " --> Index Location");
+                // Lexical breakdown of "base" lines of code
 
-                        }
-                        else if (systOut.get(v).contains("System")){
-                            System.out.println(systOut.get(v) + " --> Print Statement");
-                        }
-                    }
-                }
                 else {
                     StringTokenizer str = new StringTokenizer(linee);
                     while (str.hasMoreTokens()) {
@@ -280,25 +632,54 @@ public class Main {
                     while (i < script.size()) {
                         if (datatypes.contains(token = script.get(i))) {
                             System.out.println(token + " --> DataType");
-                            System.out.println(token = script.get(i + 1) + " --> IDENTIFIER Represents Variable Name");
+                            identifiers.add(script.get(i + 1));
+                        }
+                        else if (identifiers.contains(token = script.get(i))){
+                            System.out.println(token + " --> Variable Name (IDENTIFIER)");
                         }
                         else if (assignmentOperators.contains(token = script.get(i))) {
                             System.out.println(token + " --> Assignment Operator");
-                            System.out.println(token = script.get(i + 1) + " --> Value");
                         }
-                        else if (symbols.contains(token = script.get(i))){
-                            if (token.equals("(") || token.equals(")")){
+                        else if (symbols.contains(token = script.get(i))) {
+                            if (token.equals("(") || token.equals(")")) {
                                 System.out.println(token + " --> Parentheses");
-                            }
-                            else {
-                                System.out.println(token + " --> Curly Brackets");
+                            } else {
+                                System.out.println(token + " --> Curly Bracket (PUNCTUATOR)");
                             }
                         }
+                        else if (script.get(i).contains(";")){
+                            String arrDec = script.get(i);
+                            StringBuilder sb = new StringBuilder();
+                            int k = 0;
+                            while (arrDec.charAt(k) != ';'){
+                                sb.append(arrDec.charAt(k));
+                                k++;
+                            }
+                            token = sb.toString();
+                            
+                            if (numbers1.contains(token)){
+                                constants.add(token);
+                                System.out.println(token + " --> Value (CONSTANT)");
+                            }
+                            else if(token.equals("}")){
+                                System.out.println(token + " --> Curly Bracket (PUNCTUATOR)");
+                            }
+                            else{
+                                identifiers.add(token);
+                                System.out.println(token + " --> Variable (IDENTIFIER)");
+                            }
+                            System.out.println(arrDec.charAt(k) + " --> Semicolon (PUNCTUATOR)");
+
+
+                        }
+
+
                         i++;
                     }
                 }
                 l++;
             }
+
 
         } catch(FileNotFoundException e){
 
@@ -308,3 +689,4 @@ public class Main {
 
 
     }
+}
