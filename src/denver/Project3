@@ -1,0 +1,112 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+public class Main {
+    private ArrayList<Product> inventory = new ArrayList<>();
+    private int productCounter = 1;
+
+    private JFrame frame;
+    private JTextField nameField, quantityField, priceField;
+    private JTextArea displayArea;
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            new Main().createAndShowGUI();
+        });
+    }
+
+    private void createAndShowGUI() {
+        frame = new JFrame("Inventory Management System");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 300);
+
+        JPanel inputPanel = new JPanel(new GridLayout(3, 2));
+        nameField = new JTextField(15);
+        quantityField = new JTextField(5);
+        priceField = new JTextField(8);
+        JButton addButton = new JButton("Add Product");
+        inputPanel.add(new JLabel("Name: "));
+        inputPanel.add(nameField);
+        inputPanel.add(new JLabel("Quantity: "));
+        inputPanel.add(quantityField);
+        inputPanel.add(new JLabel("Price: "));
+        inputPanel.add(priceField);
+
+        displayArea = new JTextArea(10, 40);
+        displayArea.setEditable(false);
+
+        frame.add(inputPanel, BorderLayout.NORTH);
+        frame.add(new JScrollPane(displayArea), BorderLayout.CENTER);
+        frame.add(addButton, BorderLayout.SOUTH);
+
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addProduct();
+            }
+        });
+
+        frame.setVisible(true);
+    }
+
+    private void addProduct() {
+        String name = nameField.getText();
+        double price = Double.parseDouble(priceField.getText());
+        int quantity = Integer.parseInt(quantityField.getText());
+
+        Product product = new Product(name, productCounter++, quantity, price);
+        inventory.add(product);
+
+        displayInventory();
+        clearInputFields();
+    }
+
+    private void displayInventory() {
+        displayArea.setText("Inventory:\n");
+        displayArea.append("ID\tName\tQuantity\tPrice\n");
+
+        for (Product product : inventory) {
+            displayArea.append(product.getId() + "\t" + product.getName() + "\t" +
+                    product.getQuantity() + "\t\t" + product.getPrice() + "\n");
+        }
+    }
+
+    private void clearInputFields() {
+        nameField.setText("");
+        priceField.setText("");
+        quantityField.setText("");
+    }
+
+    class Product {
+        private String name;
+        private int id;
+        private int quantity;
+        private double price;
+
+        public Product(String name, int id, int quantity, double price) {
+            this.name = name;
+            this.id = id;
+            this.quantity = quantity;
+            this.price = price;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public int getQuantity() {
+            return quantity;
+        }
+
+        public double getPrice() {
+            return price;
+        }
+    }
+}
