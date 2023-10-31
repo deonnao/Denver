@@ -103,7 +103,8 @@ public class Main {
             logicalOperators.add("||");
             logicalOperators.add("!");
             
-            
+            // Source code broken down by certain "markers" found in the code
+
             LinkedList<String> script = new LinkedList<>(); // Linked list containing basic tokes
             LinkedList<String> headers = new LinkedList<>(); // Linked List containing tokens from lines with headers
             LinkedList<String> containsBrackets = new LinkedList<>(); // Linked List containing tokens from lines with brackets
