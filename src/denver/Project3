@@ -4,8 +4,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-public class Main {
+public class InventoryManagementSystemGUI {
+    // ArrayList to store product records
     private ArrayList<Product> inventory = new ArrayList<>();
+    // Counter for generating unique product IDs
     private int productCounter = 1;
 
     private JFrame frame;
@@ -14,7 +16,7 @@ public class Main {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            new Main().createAndShowGUI();
+            new InventoryManagementSystemGUI().createAndShowGUI();
         });
     }
 
@@ -23,6 +25,7 @@ public class Main {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 300);
 
+        // Input panel to enter product details
         JPanel inputPanel = new JPanel(new GridLayout(3, 2));
         nameField = new JTextField(15);
         quantityField = new JTextField(5);
@@ -35,13 +38,16 @@ public class Main {
         inputPanel.add(new JLabel("Price: "));
         inputPanel.add(priceField);
 
+        // Text area to display the current inventory
         displayArea = new JTextArea(10, 40);
         displayArea.setEditable(false);
 
+        // Add components to the main frame
         frame.add(inputPanel, BorderLayout.NORTH);
         frame.add(new JScrollPane(displayArea), BorderLayout.CENTER);
         frame.add(addButton, BorderLayout.SOUTH);
 
+        // ActionListener for the "Add Product" button
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -52,6 +58,7 @@ public class Main {
         frame.setVisible(true);
     }
 
+    // Method to add a new product to the inventory
     private void addProduct() {
         String name = nameField.getText();
         double price = Double.parseDouble(priceField.getText());
@@ -64,6 +71,7 @@ public class Main {
         clearInputFields();
     }
 
+    // Method to display the current inventory in the text area
     private void displayInventory() {
         displayArea.setText("Inventory:\n");
         displayArea.append("ID\tName\tQuantity\tPrice\n");
@@ -74,18 +82,21 @@ public class Main {
         }
     }
 
+    // Method to clear input fields after adding a product
     private void clearInputFields() {
         nameField.setText("");
         priceField.setText("");
         quantityField.setText("");
     }
 
+    // Product class to represent individual products
     class Product {
         private String name;
         private int id;
         private int quantity;
         private double price;
 
+        // Constructor for the Product class
         public Product(String name, int id, int quantity, double price) {
             this.name = name;
             this.id = id;
@@ -93,6 +104,7 @@ public class Main {
             this.price = price;
         }
 
+        // Getter methods for Product attributes
         public String getName() {
             return name;
         }
